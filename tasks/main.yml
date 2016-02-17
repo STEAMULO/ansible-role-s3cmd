@@ -1,0 +1,19 @@
+---
+
+######################
+# S3CMD Configuration
+######################
+  - name: Install s3cmd
+    apt: pkg=s3cmd
+
+  - name: Create a new user for {{ s3cmd_user }} if needed
+    user:
+     name={{ s3cmd_user }}
+     state=present
+
+  - stat: path="/home/{{ s3cmd_user }}/.s3cfg"
+    register: s3cfgstat
+
+  - name: Configure s3cmd
+    template: src="s3cfg.j2" dest="/home/{{ s3cmd_user }}/.s3cfg" owner="{{ s3cmd_user }}" mode=0777
+    when: not s3cfgstat.stat.exists
